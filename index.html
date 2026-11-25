@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Tiếng Trung: Mua Bán Trái Cây & Hội Thoại</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .chinese-text {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .speaking-pulse {
+            animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .tab-active {
+            border-bottom: 3px solid #e11d48;
+            color: #e11d48;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold text-xl chinese-text shadow-md">
+                        果
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold text-slate-900">Tiếng Trung Giao Tiếp: Mua Trái Cây</h1>
+                        <p class="text-xs text-slate-500">Học từ vựng trực quan & Luyện hội thoại có phát âm chuẩn</p>
+                    </div>
+                </div>
+
+                <!-- Audio Controls -->
+                <div class="flex flex-wrap items-center gap-2 bg-slate-100 p-1.5 rounded-xl self-start sm:self-auto">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-medium text-slate-600 pl-2">🎙️ Giọng đọc:</span>
+                        <select id="voiceSelector" class="bg-white text-xs font-semibold text-slate-800 py-1.5 px-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-rose-500">
+                            <option value="Aoede">Nữ - Tự nhiên, truyền cảm (Aoede)</option>
+                            <option value="Kore">Nữ - Nhẹ nhàng, rõ ràng (Kore)</option>
+                            <option value="Charon">Nam - Trầm ấm, chuẩn xác (Charon)</option>
+                            <option value="Puck">Nam - Trẻ trung, năng động (Puck)</option>
+                            <option value="webspeech">Giọng trình duyệt (Web Speech zh-CN)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-1.5 border-l border-slate-200 pl-2">
+                        <span class="text-xs font-medium text-slate-600">Tốc độ:</span>
+                        <select id="speechRate" class="bg-white text-xs font-semibold text-slate-700 py-1.5 px-2 rounded-lg border border-slate-200 focus:outline-none">
+                            <option value="0.75">0.75x</option>
+                            <option value="0.95" selected>1.0x</option>
+                            <option value="1.15">1.15x</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <nav class="flex space-x-6 border-t border-slate-100">
+                <button onclick="switchTab('vocab')" id="tab-vocab" class="py-3 text-sm sm:text-base transition-colors tab-active flex items-center gap-2">
+                    <span>📚</span> 1. Từ Vựng & Hình Minh Họa
+                </button>
+                <button onclick="switchTab('dialogue')" id="tab-dialogue" class="py-3 text-sm sm:text-base text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2">
+                    <span>💬</span> 2. Bài Tập Hội Thoại
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+        <!-- Toast Notification for Speech Status -->
+        <div id="audioToast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
+            <span class="w-3 h-3 rounded-full bg-rose-500 speaking-pulse"></span>
+            <span id="audioToastText" class="text-sm font-medium">Đang phát âm...</span>
+            <button onclick="stopSpeech()" class="ml-2 text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded-lg">Dừng</button>
+        </div>
+
+        <!-- PAGE 1: VOCABULARY -->
+        <section id="page-vocab" class="space-y-6">
+            <div class="bg-rose-50 border border-rose-100 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-bold text-rose-900 text-base sm:text-lg">Bảng Từ Vựng Theo Hình Ảnh & Hội Thoại</h2>
+                    <p class="text-sm text-rose-700 mt-0.5">Trình tự: <strong>Từ vựng → Hán Việt → Từ loại → Nghĩa → Ví dụ (giá tiền & số cân)</strong>. Bấm vào nút loa 🔊 để nghe giọng đọc.</p>
+                </div>
+                <button onclick="playAllVocab()" class="shrink-0 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+                    <span>🔊</span> Đọc tất cả từ vựng
+                </button>
+            </div>
+
+            <!-- Vocabulary Grid -->
+            <div id="vocabContainer" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <!-- Cards will be injected by JS -->
+            </div>
+        </section>
+
+        <!-- PAGE 2: DIALOGUE EXERCISE -->
+        <section id="page-dialogue" class="hidden space-y-8">
+            
+            <!-- Mini Price Reference Banner -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Bảng Giá Tham Khảo Từ Hình Ảnh (1 斤 jīn = 0.5 kg)</h3>
+                    <span class="text-xs text-rose-600 font-medium">Đơn vị tiền: 元 (yuán - tệ / Nhân dân tệ)</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 text-center">
+                    <div class="bg-amber-50 p-2 rounded-xl border border-amber-100">
+                        <div class="text-xl">🍌</div>
+                        <div class="chinese-text font-bold text-sm">香蕉</div>
+                        <div class="text-xs font-semibold text-amber-800">4.5 元/斤</div>
+                    </div>
+                    <div class="bg-purple-50 p-2 rounded-xl border border-purple-100">
+                        <div class="text-xl">🍇</div>
+                        <div class="chinese-text font-bold text-sm">葡萄</div>
+                        <div class="text-xs font-semibold text-purple-800">18 元/斤</div>
+                    </div>
+                    <div class="bg-emerald-50 p-2 rounded-xl border border-emerald-100">
+                        <div class="text-xl">🍉</div>
+                        <div class="chinese-text font-bold text-sm">西瓜</div>
+                        <div class="text-xs font-semibold text-emerald-800">2 元/斤</div>
+                    </div>
+                    <div class="bg-yellow-50 p-2 rounded-xl border border-yellow-100">
+                        <div class="text-xl">🍐</div>
+                        <div class="chinese-text font-bold text-sm">梨</div>
+                        <div class="text-xs font-semibold text-yellow-800">4 元/斤</div>
+                    </div>
+                    <div class="bg-pink-50 p-2 rounded-xl border border-pink-100">
+                        <div class="text-xl">🍑</div>
+                        <div class="chinese-text font-bold text-sm">桃</div>
+                        <div class="text-xs font-semibold text-pink-800">8 元/斤</div>
+                    </div>
+                    <div class="bg-rose-50 p-2 rounded-xl border border-rose-100">
+                        <div class="text-xl">🍓</div>
+                        <div class="chinese-text font-bold text-sm">草莓</div>
+                        <div class="text-xs font-semibold text-rose-800">15 元/斤</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIALOGUE 1 -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-900 text-white px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-rose-600 text-xs font-bold px-2.5 py-1 rounded-full uppercase">Hội thoại (1)</span>
+                            <div class="inline-flex rounded-xl bg-slate-800 p-0.5 border border-slate-700">
+                                <button onclick="setDialogueMode(1, 'practice')" id="d1-mode-practice" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-rose-600 text-white transition">✏️ Học sinh điền từ</button>
+                                <button onclick="setDialogueMode(1, 'answer')" id="d1-mode-answer" class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-300 hover:text-white transition">👁️ Xem đáp án</button>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base sm:text-lg mt-1.5">Tự chọn trái cây & số lượng mua</h3>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="d1-fruit-select" onchange="updateDialogue1()" class="bg-slate-800 text-white text-xs sm:text-sm rounded-xl px-3 py-2 border border-slate-700 focus:outline-none">
+                            <option value="香蕉|xiāngjiāo|chuối|4.5">🍌 香蕉 (4.5元/斤)</option>
+                            <option value="葡萄|pútao|nho|18">🍇 葡萄 (18元/斤)</option>
+                            <option value="西瓜|xīguā|dưa hấu|2" selected>🍉 西瓜 (2元/斤)</option>
+                            <option value="梨|lí|lê|4">🍐 梨 (4元/斤)</option>
+                            <option value="桃|táo|đào|8">🍑 桃 (8元/斤)</option>
+                            <option value="草莓|cǎoméi|dâu tây|15">🍓 草莓 (15元/斤)</option>
+                        </select>
+                        <select id="d1-weight-select" onchange="updateDialogue1()" class="bg-slate-800 text-white text-xs sm:text-sm rounded-xl px-3 py-2 border border-slate-700 focus:outline-none">
+                            <option value="1|yī">1 斤</option>
+                            <option value="2|liǎng">2 斤 (两斤)</option>
+                            <option value="3|sān" selected>3 斤</option>
+                            <option value="4|sì">4 斤</option>
+                            <option value="5|wǔ">5 斤</option>
+                        </select>
+                        <button onclick="playDialogue(1)" class="bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition">
+                            <span>▶️</span> Nghe cả đoạn
+                        </button>
+                    </div>
+                </div>
+
+                <div id="dialogue1-body" class="p-5 sm:p-6 space-y-4">
+                    <!-- Rendered dynamically -->
+                </div>
+                <div id="dialogue1-footer" class="px-5 sm:px-6 pb-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+                    <!-- Action buttons for student practice -->
+                </div>
+            </div>
+
+            <!-- DIALOGUE 2 -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-900 text-white px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-500 text-slate-950 text-xs font-bold px-2.5 py-1 rounded-full uppercase">Hội thoại (2)</span>
+                            <div class="inline-flex rounded-xl bg-slate-800 p-0.5 border border-slate-700">
+                                <button onclick="setDialogueMode(2, 'practice')" id="d2-mode-practice" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-amber-500 text-slate-950 transition">✏️ Học sinh điền từ</button>
+                                <button onclick="setDialogueMode(2, 'answer')" id="d2-mode-answer" class="px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-300 hover:text-white transition">👁️ Xem đáp án</button>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base sm:text-lg mt-1.5">Mua quýt (橘子 - júzi) 5 cân</h3>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+                            <span class="text-xs text-slate-300">Giá 1 cân quýt:</span>
+                            <select id="d2-price-select" onchange="updateDialogue2()" class="bg-slate-700 text-white text-xs sm:text-sm rounded-lg px-2 py-0.5 focus:outline-none">
+                                <option value="3|sān">3 元/斤</option>
+                                <option value="4|sì">4 元/斤</option>
+                                <option value="5|wǔ" selected>5 元/斤</option>
+                                <option value="6|liù">6 元/斤</option>
+                            </select>
+                        </div>
+                        <button onclick="playDialogue(2)" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition">
+                            <span>▶️</span> Nghe cả đoạn
+                        </button>
+                    </div>
+                </div>
+
+                <div id="dialogue2-body" class="p-5 sm:p-6 space-y-4">
+                    <!-- Rendered dynamically -->
+                </div>
+                <div id="dialogue2-footer" class="px-5 sm:px-6 pb-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+                    <!-- Action buttons for student practice -->
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        Ứng dụng hỗ trợ học tiếng Trung trực quan • Sử dụng công nghệ tổng hợp giọng nói bản xứ (Text-to-Speech)
+    </footer>
+
+    <script>
+        // ==========================================
+        // SPEECH SYNTHESIS (Gemini TTS AI Voices + Web Speech Fallback)
+        // ==========================================
+        let zhVoices = [];
+        let currentAudioEl = null;
+        let isPlayingSequence = false;
+        const audioCache = new Map();
+
+        function loadVoices() {
+            const allVoices = window.speechSynthesis.getVoices();
+            zhVoices = allVoices.filter(v => v.lang.includes('zh') || v.lang.includes('cmn'));
+        }
+
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('audioToast');
+            document.getElementById('audioToastText').innerText = text;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('audioToast');
+            toast.classList.add('translate-y-24', 'opacity-0');
+        }
+
+        function stopSpeech() {
+            isPlayingSequence = false;
+            window.speechSynthesis.cancel();
+            if (currentAudioEl) {
+                currentAudioEl.pause();
+                currentAudioEl.currentTime = 0;
+                currentAudioEl = null;
+            }
+            hideToast();
+        }
+
+        // Convert base64 raw PCM16 to WAV Blob
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function pcmToWav(pcm16, sampleRate) {
+            const numChannels = 1;
+            const bytesPerSample = 2;
+            const blockAlign = numChannels * bytesPerSample;
+            const byteRate = sampleRate * blockAlign;
+            const dataSize = pcm16.length * bytesPerSample;
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+
+            function writeString(offset, str) {
+                for (let i = 0; i < str.length; i++) {
+                    view.setUint8(offset + i, str.charCodeAt(i));
+                }
+            }
+
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + dataSize, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, dataSize, true);
+
+            let offset = 44;
+            for (let i = 0; i < pcm16.length; i++, offset += 2) {
+                view.setInt16(offset, pcm16[i], true);
+            }
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        async function fetchGeminiTTS(text, voiceName) {
+            const cacheKey = `${voiceName}::${text}`;
+            if (audioCache.has(cacheKey)) {
+                return audioCache.get(cacheKey);
+            }
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{
+                    parts: [{ text: `Read naturally in Mandarin Chinese: ${text}` }]
+                }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: voiceName }
+                        }
+                    }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+
+            const delays = [1000, 2000, 4000];
+            for (let attempt = 0; attempt <= delays.length; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const result = await response.json();
+                    const part = result?.candidates?.[0]?.content?.parts?.[0];
+                    const audioData = part?.inlineData?.data;
+                    const mimeType = part?.inlineData?.mimeType;
+
+                    if (audioData && mimeType && mimeType.startsWith("audio/")) {
+                        const rateMatch = mimeType.match(/rate=(\d+)/);
+                        const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
+                        const pcmData = base64ToArrayBuffer(audioData);
+                        const pcm16 = new Int16Array(pcmData);
+                        const wavBlob = pcmToWav(pcm16, sampleRate);
+                        const audioUrl = URL.createObjectURL(wavBlob);
+                        audioCache.set(cacheKey, audioUrl);
+                        return audioUrl;
+                    }
+                    throw new Error("Invalid audio payload");
+                } catch (err) {
+                    if (attempt === delays.length) {
+                        return null;
+                    }
+                    await new Promise(r => setTimeout(r, delays[attempt]));
+                }
+            }
+            return null;
+        }
+
+        function speakWithWebSpeech(text, role, rate, onEndCallback) {
+            if (!('speechSynthesis' in window)) {
+                showToast("Trình duyệt không hỗ trợ đọc giọng nói.");
+                setTimeout(hideToast, 3000);
+                return;
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = rate;
+
+            if (zhVoices.length > 0) {
+                if (role === 'A') {
+                    utterance.voice = zhVoices[0];
+                    utterance.pitch = 1.06;
+                } else if (role === 'B') {
+                    utterance.voice = zhVoices[zhVoices.length > 1 ? 1 : 0];
+                    utterance.pitch = 0.9;
+                } else {
+                    utterance.voice = zhVoices[0];
+                    utterance.pitch = 1.0;
+                }
+            } else {
+                utterance.pitch = role === 'B' ? 0.88 : 1.05;
+            }
+
+            utterance.onstart = () => showToast(`Đang đọc (Web Speech): "${text}"`);
+            utterance.onend = () => {
+                if (onEndCallback) onEndCallback();
+                else hideToast();
+            };
+            utterance.onerror = () => hideToast();
+            window.speechSynthesis.speak(utterance);
+        }
+
+        async function speakChinese(text, role = 'default', onEndCallback = null) {
+            window.speechSynthesis.cancel();
+            if (currentAudioEl) {
+                currentAudioEl.pause();
+                currentAudioEl = null;
+            }
+
+            const selectedVoice = document.getElementById('voiceSelector').value;
+            const rate = parseFloat(document.getElementById('speechRate').value) || 0.95;
+
+            if (selectedVoice === 'webspeech') {
+                speakWithWebSpeech(text, role, rate, onEndCallback);
+                return;
+            }
+
+            // Nếu đang đọc hội thoại phân vai, tự động phối hợp giọng nam/nữ nếu cần, hoặc dùng đúng giọng đã chọn
+            let voiceToUse = selectedVoice;
+            if (role === 'B' && (selectedVoice === 'Aoede' || selectedVoice === 'Kore')) {
+                // Giữ nguyên giọng người dùng chọn cho tất cả hoặc tạo sắc thái tự nhiên
+                voiceToUse = selectedVoice;
+            }
+
+            showToast(`Đang tạo giọng AI (${voiceToUse})...`);
+            const audioUrl = await fetchGeminiTTS(text, voiceToUse);
+
+            if (!audioUrl) {
+                // Fallback mượt mà sang Web Speech nếu mất kết nối API
+                speakWithWebSpeech(text, role, rate, onEndCallback);
+                return;
+            }
+
+            const audio = new Audio(audioUrl);
+            audio.playbackRate = rate;
+            currentAudioEl = audio;
+
+            audio.onplay = () => {
+                showToast(`Đang đọc (${voiceToUse}): "${text}"`);
+            };
+            audio.onended = () => {
+                currentAudioEl = null;
+                if (onEndCallback) onEndCallback();
+                else hideToast();
+            };
+            audio.onerror = () => {
+                currentAudioEl = null;
+                hideToast();
+            };
+
+            try {
+                await audio.play();
+            } catch (e) {
+                speakWithWebSpeech(text, role, rate, onEndCallback);
+            }
+        }
+
+        // ==========================================
+        // DATA & HELPER FUNCTIONS
+        // ==========================================
+        const vocabularyList = [
+            {
+                hanzi: "香蕉",
+                pinyin: "xiāngjiāo",
+                hanViet: "Hương tiêu",
+                pos: "Danh từ",
+                meaning: "Chuối",
+                priceText: "4.5 元 / 斤",
+                exampleHanzi: "香蕉四块五一斤，我买两斤。",
+                examplePinyin: "Xiāngjiāo sì kuài wǔ yì jīn, wǒ mǎi liǎng jīn.",
+                exampleVi: "Chuối 4.5 tệ một cân, tôi mua 2 cân.",
+                color: "bg-amber-50 border-amber-200",
+                svg: `<svg viewBox="0 0 100 100" class="w-20 h-20"><path d="M25,75 Q55,85 80,35 Q83,28 77,26 Q60,62 22,68 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="2"/><path d="M20,65 Q50,72 72,25 Q75,18 69,17 Q53,50 18,58 Z" fill="#FEF08A" stroke="#CA8A04" stroke-width="2"/><path d="M75,24 L82,19 L84,23 L78,28 Z" fill="#713F12"/></svg>`
+            },
+            {
+                hanzi: "葡萄",
+                pinyin: "pútao",
+                hanViet: "Bồ đào",
+                pos: "Danh từ",
+                meaning: "Nho",
+                priceText: "18 元 / 斤",
+                exampleHanzi: "葡萄十八元一斤，我买一斤。",
+                examplePinyin: "Pútao shíbā yuán yì jīn, wǒ mǎi yì jīn.",
+                exampleVi: "Nho 18 tệ một cân, tôi mua 1 cân.",
+                color: "bg-purple-50 border-purple-200",
+                svg: `<svg viewBox="0 0 100 100" class="w-20 h-20"><path d="M50,15 Q55,25 50,32" stroke="#15803D" stroke-width="4" fill="none"/><path d="M50,22 Q68,12 72,25 Q60,32 50,22 Z" fill="#22C55E"/><circle cx="40" cy="40" r="10" fill="#7E22CE"/><circle cx="60" cy="40" r="10" fill="#9333EA"/><circle cx="50" cy="43" r="10" fill="#6B21A8"/><circle cx="35" cy="56" r="10" fill="#9333EA"/><circle cx="50" cy="58" r="10" fill="#7E22CE"/><circle cx="65" cy="56" r="10" fill="#6B21A8"/><circle cx="43" cy="72" r="10" fill="#6B21A8"/><circle cx="57" cy="72" r="10" fill="#9333EA"/><circle cx="50" cy="84" r="9" fill="#7E22CE"/></svg>`
+            },
+            {
+                hanzi: "西瓜",
+                pinyin: "xīguā",
+                hanViet: "Tây qua",
+                pos: "Danh từ",
+                meaning: "Dưa hấu",
+                priceText: "2 元 / 斤",
+                exampleHanzi: "西瓜两元一斤，我买五斤。",
+                examplePinyin: "Xīguā liǎng yuán yì jīn, wǒ mǎi wǔ jīn.",
+                exampleVi: "Dưa hấu 2 tệ một cân, tôi mua 5 cân.",
+                color: "bg-emerald-50 border-emerald-200",
+                svg: `<svg viewBox="0 0 100 100" class="w-20 h-20"><circle cx="58" cy="45" r="28" fill="#16A34A" stroke="#14532D" stroke-width="2"/><path d="M15,62 A32,32 0 0,0 75,62 Z" fill="#15803D"/><path d="M20,62 A27,27 0 0,0 70,62 Z" fill="#EF4444"/><circle cx="38" cy="68" r="1.8" fill="#1E293B"/><circle cx="46" cy="72" r="1.8" fill="#1E293B"/><circle cx="54" cy="68" r="1.8" fill="#1E293B"/></svg>`
+            },
+            {
+                hanzi: "梨",
+                pinyin: "lí",
+                hanViet: "Lê",
+                pos: "Danh từ",
+                meaning: "Quả lê",
+                priceText: "4 元 / 斤",
+                exampleHanzi: "梨四元一斤，我买三斤。",
+                examplePinyin: "Lí sì yuán yì jīn, wǒ mǎi sān jīn.",
+                exampleVi: "Lê 4 tệ một cân, tôi mua 3 cân.",
+                color: "bg-yellow-50 border-yellow-200",
+                svg: `<svg viewBox="0 0 100 100" class="w-20 h-20"><path d="M50,24 L52,14" stroke="#78350F" stroke-width="3" stroke-linecap="round"/><path d="M51,18 Q64,12 66,20 Q56,24 51,18 Z" fill="#22C55E"/><path d="M50,24 C40,24 38,38 34,48 C26,64 32,84 50,84 C68,84 74,64 66,48 C62,38 60,24 50,24 Z" fill="#FDE047" stroke="#CA8A04" stroke-width="2"/></svg>`
+            },
+            {
+                hanzi: "桃",
+                pinyin: "táo",
+                hanViet: "Đào",
+                pos: "Danh từ",
+                meaning: "Quả đào",
+                priceText: "8 元 / 斤",
+                exampleHanzi: "桃八元一斤，我买两斤。",
+                examplePinyin: "Táo bā yuán yì jīn, wǒ mǎi liǎng jīn.",
+                exampleVi: "Đào 8 tệ một cân, tôi mua 2 cân.",
+                color: "bg-pink-50 border-pink-200",
+                svg: `<svg viewBox="0 0 100 100" class="w-20 h-20"><path d="M50,26 Q66,14 74,24 Q60,30 50,26 Z" fill="#16A34A"/><path d="M50,30 C32,22 20,42 26,62 C32,78 46,84 50,86 C54,84 68,78 74,62 C80,42 68,22 50,30 Z" fill="#FB7185" stroke="#E11D48" stroke-width="2"/><path d="M50,30 Q44,55 50,86" stroke="#BE123C" stroke-width="2" fill="none"/></svg>`
+            },
+            {
+                hanzi: "草莓",
+                pinyin: "cǎoméi",
+                hanViet: "Thảo môi",
+                pos: "Danh từ",
+                meaning: "Dâu tây",
+                priceText: "15 元 / 斤",
+                exampleHanzi: "草莓十五元一斤，我买一斤。",
+                examplePinyin: "Cǎoméi shíwǔ yuán yì jīn, wǒ mǎi yì jīn.",
+                exampleVi: "Dâu tây 15 tệ một cân, tôi mua 1 cân.",
+                color: "bg-rose-50 border-rose-200",
+                svg: `<svg viewBox="0 0 100 100" class="w-20 h-20"><path d="M32,32 C24,48 36,78 50,84 C64,78 76,48 68,32 C58,26 42,26 32,32 Z" fill="#E11D48"/><path d="M30,32 L42,38 L50,28 L58,38 L70,32 L58,24 L42,24 Z" fill="#16A34A"/><circle cx="42" cy="46" r="1.5" fill="#FEF08A"/><circle cx="58" cy="46" r="1.5" fill="#FEF08A"/><circle cx="50" cy="56" r="1.5" fill="#FEF08A"/><circle cx="42" cy="66" r="1.5" fill="#FEF08A"/><circle cx="58" cy="66" r="1.5" fill="#FEF08A"/></svg>`
+            },
+            {
+                hanzi: "橘子",
+                pinyin: "júzi",
+                hanViet: "Quất tử",
+                pos: "Danh từ",
+                meaning: "Quả quýt (xuất hiện trong Hội thoại 2)",
+                priceText: "5 元 / 斤 (mẫu)",
+                exampleHanzi: "我买橘子，我买五斤。",
+                examplePinyin: "Wǒ mǎi júzi, wǒ mǎi wǔ jīn.",
+                exampleVi: "Tôi mua quýt, tôi mua 5 cân.",
+                color: "bg-orange-50 border-orange-200",
+                svg: `<svg viewBox="0 0 100 100" class="w-20 h-20"><circle cx="50" cy="54" r="28" fill="#F97316" stroke="#EA580C" stroke-width="2"/><circle cx="50" cy="28" r="4" fill="#15803D"/><path d="M50,28 Q64,18 68,26 Q58,32 50,28 Z" fill="#22C55E"/></svg>`
+            },
+            {
+                hanzi: "斤 / 元",
+                pinyin: "jīn / yuán",
+                hanViet: "Cân / Nguyên",
+                pos: "Lượng từ",
+                meaning: "Cân Trung Quốc (0.5kg) / Tệ (đơn vị tiền Nhân dân tệ)",
+                priceText: "Đơn vị đo & tiền",
+                exampleHanzi: "一斤多少钱？一共二十五元。",
+                examplePinyin: "Yì jīn duōshao qián? Yīgòng èrshíwǔ yuán.",
+                exampleVi: "Một cân bao nhiêu tiền? Tổng cộng 25 tệ.",
+                color: "bg-slate-100 border-slate-200",
+                svg: `<svg viewBox="0 0 100 100" class="w-20 h-20"><circle cx="50" cy="50" r="30" fill="#FBBF24" stroke="#D97706" stroke-width="3"/><text x="50" y="58" text-anchor="middle" font-size="26" font-weight="bold" fill="#78350F">¥</text></svg>`
+            }
+        ];
+
+        function numberToChinese(num) {
+            const digits = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+            const pinyins = ["líng", "yī", "èr", "sān", "sì", "wǔ", "liù", "qī", "bā", "jiǔ"];
+            if (num <= 9) return { hanzi: digits[num], pinyin: pinyins[num] };
+            if (num === 10) return { hanzi: "十", pinyin: "shí" };
+            if (num < 20) {
+                const u = num % 10;
+                return { hanzi: "十" + digits[u], pinyin: "shí " + pinyins[u] };
+            }
+            const t = Math.floor(num / 10);
+            const u = num % 10;
+            if (u === 0) return { hanzi: digits[t] + "十", pinyin: pinyins[t] + "shí" };
+            return { hanzi: digits[t] + "十" + digits[u], pinyin: pinyins[t] + "shí " + pinyins[u] };
+        }
+
+        function formatMoneyChinese(amount) {
+            const intPart = Math.floor(amount);
+            const decPart = Math.round((amount - intPart) * 10);
+            const intObj = intPart === 2 ? { hanzi: "两", pinyin: "liǎng" } : numberToChinese(intPart);
+            if (decPart === 0) {
+                return {
+                    hanzi: `${intObj.hanzi}元`,
+                    pinyin: `${intObj.pinyin} yuán`,
+                    vi: `${intPart} tệ`
+                };
+            }
+            const decObj = numberToChinese(decPart);
+            return {
+                hanzi: `${intObj.hanzi}块${decObj.hanzi}`,
+                pinyin: `${intObj.pinyin} kuài ${decObj.pinyin}`,
+                vi: `${amount} tệ`
+            };
+        }
+
+        function switchTab(tabName) {
+            stopSpeech();
+            const pageVocab = document.getElementById('page-vocab');
+            const pageDialogue = document.getElementById('page-dialogue');
+            const tabVocab = document.getElementById('tab-vocab');
+            const tabDialogue = document.getElementById('tab-dialogue');
+
+            if (tabName === 'vocab') {
+                pageVocab.classList.remove('hidden');
+                pageDialogue.classList.add('hidden');
+                tabVocab.classList.add('tab-active');
+                tabVocab.classList.remove('text-slate-500');
+                tabDialogue.classList.remove('tab-active');
+                tabDialogue.classList.add('text-slate-500');
+            } else {
+                pageVocab.classList.add('hidden');
+                pageDialogue.classList.remove('hidden');
+                tabDialogue.classList.add('tab-active');
+                tabDialogue.classList.remove('text-slate-500');
+                tabVocab.classList.remove('tab-active');
+                tabVocab.classList.add('text-slate-500');
+            }
+        }
+
+        // ==========================================
+        // RENDER PAGE 1: VOCABULARY
+        // ==========================================
+        function renderVocabulary() {
+            const container = document.getElementById('vocabContainer');
+            container.innerHTML = vocabularyList.map((item) => `
+                <div class="bg-white rounded-2xl p-5 shadow-xs border border-slate-200 hover:shadow-md transition flex flex-col justify-between gap-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-24 h-24 rounded-2xl ${item.color} border flex flex-col items-center justify-center shrink-0 p-2">
+                            ${item.svg}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">${item.priceText}</span>
+                                    <h3 class="chinese-text text-2xl font-bold text-slate-900 mt-1">${item.hanzi} <span class="text-base font-medium text-slate-500 font-sans">(${item.pinyin})</span></h3>
+                                </div>
+                                <button onclick="speakChinese('${item.hanzi}')" class="w-9 h-9 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white flex items-center justify-center transition shrink-0" title="Đọc từ vựng">
+                                    🔊
+                                </button>
+                            </div>
+                            <div class="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 text-xs sm:text-sm">
+                                <div><span class="text-slate-400">Hán Việt:</span> <strong class="text-slate-700">${item.hanViet}</strong></div>
+                                <div><span class="text-slate-400">Từ loại:</span> <strong class="text-slate-700">${item.pos}</strong></div>
+                                <div class="col-span-2"><span class="text-slate-400">Nghĩa:</span> <strong class="text-rose-700">${item.meaning}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-[11px] font-bold uppercase text-slate-400">Ví dụ thực tế</div>
+                            <p class="chinese-text font-bold text-slate-800 text-sm sm:text-base mt-0.5">${item.exampleHanzi}</p>
+                            <p class="text-xs text-slate-500">${item.examplePinyin}</p>
+                            <p class="text-xs text-slate-600 mt-0.5 italic">→ ${item.exampleVi}</p>
+                        </div>
+                        <button onclick="speakChinese('${item.exampleHanzi}')" class="px-2.5 py-2 rounded-lg bg-white hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-200 text-xs font-semibold transition shrink-0" title="Đọc câu ví dụ">
+                            🔊 Câu
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playAllVocab() {
+            stopSpeech();
+            isPlayingSequence = true;
+            let index = 0;
+            function next() {
+                if (!isPlayingSequence) return;
+                if (index < vocabularyList.length) {
+                    const item = vocabularyList[index];
+                    index++;
+                    speakChinese(item.hanzi + "。" + item.exampleHanzi, 'default', () => {
+                        if (isPlayingSequence) setTimeout(next, 500);
+                    });
+                } else {
+                    isPlayingSequence = false;
+                    hideToast();
+                }
+            }
+            next();
+        }
+
+        // ==========================================
+        // RENDER PAGE 2: DIALOGUES (Practice Mode & Answer Mode)
+        // ==========================================
+        let currentD1Lines = [];
+        let currentD2Lines = [];
+        let dialogueModes = { 1: 'practice', 2: 'practice' };
+
+        function setDialogueMode(dialogueNum, mode) {
+            dialogueModes[dialogueNum] = mode;
+            const btnPractice = document.getElementById(`d${dialogueNum}-mode-practice`);
+            const btnAnswer = document.getElementById(`d${dialogueNum}-mode-answer`);
+            const activeClass = dialogueNum === 1 ? 'bg-rose-600 text-white' : 'bg-amber-500 text-slate-950';
+
+            if (mode === 'practice') {
+                btnPractice.className = `px-2.5 py-1 text-xs font-semibold rounded-lg transition ${activeClass}`;
+                btnAnswer.className = `px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-300 hover:text-white transition`;
+            } else {
+                btnAnswer.className = `px-2.5 py-1 text-xs font-semibold rounded-lg transition ${activeClass}`;
+                btnPractice.className = `px-2.5 py-1 text-xs font-semibold rounded-lg text-slate-300 hover:text-white transition`;
+            }
+
+            if (dialogueNum === 1) updateDialogue1();
+            else updateDialogue2();
+        }
+
+        function updateDialogue1() {
+            const fruitVal = document.getElementById('d1-fruit-select').value.split('|');
+            const weightVal = document.getElementById('d1-weight-select').value.split('|');
+
+            const fruitHanzi = fruitVal[0];
+            const fruitPinyin = fruitVal[1];
+            const fruitVi = fruitVal[2];
+            const unitPrice = parseFloat(fruitVal[3]);
+
+            const weightNum = parseInt(weightVal[0]);
+            const weightPinyin = weightVal[1];
+            const weightHanzi = weightNum === 2 ? "两" : numberToChinese(weightNum).hanzi;
+
+            const total = unitPrice * weightNum;
+            const totalObj = formatMoneyChinese(total);
+
+            currentD1Lines = [
+                {
+                    role: 'A',
+                    label: 'Người bán (A)',
+                    hanzi: '您买什么？',
+                    pinyin: 'Nín mǎi shénme?',
+                    vi: 'Ông/bà mua gì ạ?',
+                    isBlank: false
+                },
+                {
+                    role: 'B',
+                    label: 'Người mua (B)',
+                    hanzi: `我买${fruitHanzi}。`,
+                    pinyin: `Wǒ mǎi ${fruitPinyin}.`,
+                    vi: `Tôi mua ${fruitVi}.`,
+                    isBlank: true,
+                    blanks: [
+                        {
+                            prefixHanzi: '',
+                            suffixHanzi: '。',
+                            answerHanzi: `我买${fruitHanzi}`,
+                            answerPinyin: `Wǒ mǎi ${fruitPinyin}`,
+                            placeholder: `Điền: Tôi mua ${fruitVi} (VD: 我买${fruitHanzi})`,
+                            hint: `Gợi ý: 我买 + ${fruitHanzi} (${fruitPinyin})`
+                        }
+                    ]
+                },
+                {
+                    role: 'A',
+                    label: 'Người bán (A)',
+                    hanzi: '您买多少？',
+                    pinyin: 'Nín mǎi duōshao?',
+                    vi: 'Ông/bà mua bao nhiêu?',
+                    isBlank: false
+                },
+                {
+                    role: 'B',
+                    label: 'Người mua (B)',
+                    hanzi: `我买${weightHanzi}斤。`,
+                    pinyin: `Wǒ mǎi ${weightPinyin} jīn.`,
+                    vi: `Tôi mua ${weightNum} cân.`,
+                    isBlank: true,
+                    blanks: [
+                        {
+                            prefixHanzi: '',
+                            suffixHanzi: '。',
+                            answerHanzi: `我买${weightHanzi}斤`,
+                            answerPinyin: `Wǒ mǎi ${weightPinyin} jīn`,
+                            placeholder: `Điền: Tôi mua ${weightNum} cân (VD: 我买${weightHanzi}斤)`,
+                            hint: `Gợi ý: 我买${weightHanzi}斤 (${weightPinyin} jīn)`
+                        }
+                    ]
+                },
+                {
+                    role: 'A',
+                    label: 'Người bán (A)',
+                    hanzi: '还要别的吗？',
+                    pinyin: 'Hái yào bié de ma?',
+                    vi: 'Còn cần mua gì khác không ạ?',
+                    isBlank: false
+                },
+                {
+                    role: 'B',
+                    label: 'Người mua (B)',
+                    hanzi: '不要了。一共多少钱？',
+                    pinyin: 'Bú yào le. Yīgòng duōshao qián?',
+                    vi: 'Không cần nữa. Tổng cộng bao nhiêu tiền?',
+                    isBlank: true,
+                    blanks: [
+                        {
+                            prefixHanzi: '',
+                            suffixHanzi: '。',
+                            answerHanzi: '不要了',
+                            answerPinyin: 'Bú yào le',
+                            placeholder: 'Không cần nữa...',
+                            hint: 'Gợi ý: 不要了 (Bú yào le)'
+                        },
+                        {
+                            prefixHanzi: '',
+                            suffixHanzi: '？',
+                            answerHanzi: '一共多少钱',
+                            answerPinyin: 'Yīgòng duōshao qián',
+                            placeholder: 'Tổng cộng bao nhiêu tiền...',
+                            hint: 'Gợi ý: 一共多少钱 (Yīgòng duōshao qián)'
+                        }
+                    ]
+                },
+                {
+                    role: 'A',
+                    label: 'Người bán (A)',
+                    hanzi: `一共${totalObj.hanzi}。`,
+                    pinyin: `Yīgòng ${totalObj.pinyin}.`,
+                    vi: `Tổng cộng ${totalObj.vi} (${weightNum} cân × ${unitPrice} tệ/cân).`,
+                    isBlank: true,
+                    blanks: [
+                        {
+                            prefixHanzi: '一共 ',
+                            suffixHanzi: '。',
+                            answerHanzi: `${totalObj.hanzi}`,
+                            answerPinyin: `${totalObj.pinyin}`,
+                            placeholder: `Số tiền (${weightNum} × ${unitPrice} tệ)...`,
+                            hint: `Gợi ý: ${totalObj.hanzi} (${totalObj.pinyin})`
+                        }
+                    ]
+                }
+            ];
+
+            renderDialogue(1, 'dialogue1-body', 'dialogue1-footer', currentD1Lines);
+        }
+
+        function updateDialogue2() {
+            const priceVal = document.getElementById('d2-price-select').value.split('|');
+            const unitPrice = parseInt(priceVal[0]);
+            const pricePinyin = priceVal[1];
+            const priceHanzi = numberToChinese(unitPrice).hanzi;
+
+            const total = unitPrice * 5;
+            const totalObj = numberToChinese(total);
+
+            currentD2Lines = [
+                {
+                    role: 'A',
+                    label: 'Người bán (A)',
+                    hanzi: '您买什么？',
+                    pinyin: 'Nín mǎi shénme?',
+                    vi: 'Ông/bà mua gì ạ?',
+                    isBlank: true,
+                    blanks: [
+                        {
+                            prefixHanzi: '',
+                            suffixHanzi: '？',
+                            answerHanzi: '您买什么',
+                            answerPinyin: 'Nín mǎi shénme',
+                            placeholder: 'Hỏi khách mua gì...',
+                            hint: 'Gợi ý: 您买什么 (Nín mǎi shénme)'
+                        }
+                    ]
+                },
+                {
+                    role: 'B',
+                    label: 'Người mua (B)',
+                    hanzi: '我买橘子。一斤多少钱？',
+                    pinyin: 'Wǒ mǎi júzi. Yì jīn duōshao qián?',
+                    vi: 'Tôi mua quýt. Một cân bao nhiêu tiền?',
+                    isBlank: false
+                },
+                {
+                    role: 'A',
+                    label: 'Người bán (A)',
+                    hanzi: `一斤${priceHanzi}元。`,
+                    pinyin: `Yì jīn ${pricePinyin} yuán.`,
+                    vi: `Một cân ${unitPrice} tệ.`,
+                    isBlank: true,
+                    blanks: [
+                        {
+                            prefixHanzi: '',
+                            suffixHanzi: '。',
+                            answerHanzi: `一斤${priceHanzi}元`,
+                            answerPinyin: `Yì jīn ${pricePinyin} yuán`,
+                            placeholder: `Báo giá 1 cân ${unitPrice} tệ...`,
+                            hint: `Gợi ý: 一斤${priceHanzi}元 (Yì jīn ${pricePinyin} yuán)`
+                        }
+                    ]
+                },
+                {
+                    role: 'B',
+                    label: 'Người mua (B)',
+                    hanzi: '我买五斤。一共多少钱？',
+                    pinyin: 'Wǒ mǎi wǔ jīn. Yīgòng duōshao qián?',
+                    vi: 'Tôi mua 5 cân. Tổng cộng bao nhiêu tiền?',
+                    isBlank: false
+                },
+                {
+                    role: 'A',
+                    label: 'Người bán (A)',
+                    hanzi: `一共${totalObj.hanzi}元。还要别的吗？`,
+                    pinyin: `Yīgòng ${totalObj.pinyin} yuán. Hái yào bié de ma?`,
+                    vi: `Tổng cộng ${total} tệ. Còn cần mua gì khác không ạ?`,
+                    isBlank: true,
+                    blanks: [
+                        {
+                            prefixHanzi: '',
+                            suffixHanzi: '。',
+                            answerHanzi: `一共${totalObj.hanzi}元`,
+                            answerPinyin: `Yīgòng ${totalObj.pinyin} yuán`,
+                            placeholder: `Tổng cộng ${total} tệ...`,
+                            hint: `Gợi ý: 一共${totalObj.hanzi}元 (Yīgòng ${totalObj.pinyin} yuán)`
+                        },
+                        {
+                            prefixHanzi: '',
+                            suffixHanzi: '？',
+                            answerHanzi: '还要别的吗',
+                            answerPinyin: 'Hái yào bié de ma',
+                            placeholder: 'Còn cần mua gì khác không...',
+                            hint: 'Gợi ý: 还要别的吗 (Hái yào bié de ma)'
+                        }
+                    ]
+                },
+                {
+                    role: 'B',
+                    label: 'Người mua (B)',
+                    hanzi: '不要了。谢谢！',
+                    pinyin: 'Bú yào le. Xièxie!',
+                    vi: 'Không cần nữa. Cảm ơn!',
+                    isBlank: false
+                }
+            ];
+
+            renderDialogue(2, 'dialogue2-body', 'dialogue2-footer', currentD2Lines);
+        }
+
+        function normalizeAnswer(str) {
+            return str
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[.,?!。，？！\s]/g, "")
+                .trim();
+        }
+
+        function renderDialogue(dialogueNum, containerId, footerId, lines) {
+            const container = document.getElementById(containerId);
+            const footer = document.getElementById(footerId);
+            const mode = dialogueModes[dialogueNum];
+
+            container.innerHTML = lines.map((line, lineIdx) => {
+                const isA = line.role === 'A';
+
+                if (mode === 'practice' && line.isBlank && line.blanks) {
+                    const inputsHtml = line.blanks.map((b, bIdx) => {
+                        const inputId = `d${dialogueNum}-l${lineIdx}-b${bIdx}`;
+                        const feedbackId = `fb-${inputId}`;
+                        return `
+                            <div class="mt-2">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    ${b.prefixHanzi ? `<span class="chinese-text text-lg font-bold text-slate-900">${b.prefixHanzi}</span>` : ''}
+                                    <input
+                                        type="text"
+                                        id="${inputId}"
+                                        data-hanzi="${b.answerHanzi}"
+                                        data-pinyin="${b.answerPinyin}"
+                                        placeholder="${b.placeholder}"
+                                        class="chinese-text flex-1 min-w-[200px] bg-white border-2 border-dashed border-slate-300 focus:border-rose-500 focus:border-solid rounded-xl px-3 py-1.5 text-base font-bold text-slate-900 focus:outline-none transition"
+                                    />
+                                    <span class="chinese-text text-lg font-bold text-slate-900">${b.suffixHanzi}</span>
+                                    <button onclick="toggleHint('${feedbackId}', '${b.hint.replace(/'/g, "\\'")}')" type="button" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold px-2.5 py-1.5 rounded-lg transition" title="Xem gợi ý">
+                                        💡 Gợi ý
+                                    </button>
+                                </div>
+                                <div id="${feedbackId}" class="text-xs mt-1 hidden font-medium"></div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    return `
+                    <div class="flex items-start gap-3 sm:gap-4 ${isA ? '' : 'flex-row-reverse'}">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-xs ${isA ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}">
+                            ${line.role}
+                        </div>
+                        <div class="max-w-xl w-full rounded-2xl p-3.5 sm:p-4 border bg-amber-50/50 border-amber-200">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs font-bold ${isA ? 'text-rose-600' : 'text-blue-600'}">
+                                    ${line.label} • <span class="text-amber-700">Chỗ trống cần điền</span>
+                                </span>
+                                <button onclick="speakChinese('${line.hanzi}', '${line.role}')" class="text-xs bg-white hover:bg-slate-800 hover:text-white text-slate-700 border border-slate-200 px-2.5 py-1 rounded-lg transition flex items-center gap-1 shadow-2xs" title="Nghe mẫu để điền">
+                                    <span>🎧</span> Nghe gợi ý
+                                </button>
+                            </div>
+                            ${inputsHtml}
+                            <p class="text-xs text-slate-500 mt-2 border-t border-amber-200/60 pt-1.5">Nghĩa tiếng Việt: <strong>${line.vi}</strong></p>
+                        </div>
+                    </div>
+                    `;
+                }
+
+                // Answer Mode or Static Line
+                return `
+                <div class="flex items-start gap-3 sm:gap-4 ${isA ? '' : 'flex-row-reverse'}">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-xs ${isA ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}">
+                        ${line.role}
+                    </div>
+                    <div class="max-w-xl w-full rounded-2xl p-3.5 sm:p-4 border ${line.isBlank ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200'}">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-xs font-bold ${isA ? 'text-rose-600' : 'text-blue-600'}">
+                                ${line.label} ${line.isBlank ? '• <span class="text-emerald-700 underline">Đáp án hoàn chỉnh</span>' : ''}
+                            </span>
+                            <button onclick="speakChinese('${line.hanzi}', '${line.role}')" class="text-xs bg-white hover:bg-slate-800 hover:text-white text-slate-700 border border-slate-200 px-2.5 py-1 rounded-lg transition flex items-center gap-1 shadow-2xs">
+                                <span>🔊</span> Nghe
+                            </button>
+                        </div>
+                        <p class="chinese-text text-lg sm:text-xl font-bold text-slate-900">${line.hanzi}</p>
+                        <p class="text-xs sm:text-sm font-medium text-slate-600 mt-0.5">${line.pinyin}</p>
+                        <p class="text-xs text-slate-500 mt-1 border-t border-slate-200/70 pt-1">${line.vi}</p>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            if (mode === 'practice') {
+                footer.classList.remove('hidden');
+                footer.innerHTML = `
+                    <div id="d${dialogueNum}-score" class="text-sm font-semibold text-slate-600">
+                        Nhập chữ Hán hoặc Pinyin không dấu vào chỗ trống rồi bấm kiểm tra.
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="resetDialogueInputs(${dialogueNum})" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                            🔄 Làm lại
+                        </button>
+                        <button onclick="checkDialogueAnswers(${dialogueNum})" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition">
+                            ✅ Kiểm tra bài làm
+                        </button>
+                    </div>
+                `;
+            } else {
+                footer.classList.add('hidden');
+            }
+        }
+
+        function toggleHint(feedbackId, hintText) {
+            const el = document.getElementById(feedbackId);
+            if (!el) return;
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                el.className = 'text-xs mt-1.5 font-medium text-amber-700 bg-amber-100/70 px-2.5 py-1 rounded-lg inline-block';
+                el.innerText = hintText;
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function checkDialogueAnswers(dialogueNum) {
+            const inputs = document.querySelectorAll(`#dialogue${dialogueNum}-body input[type="text"]`);
+            let correctCount = 0;
+
+            inputs.forEach(input => {
+                const userVal = normalizeAnswer(input.value);
+                const ansHanzi = normalizeAnswer(input.dataset.hanzi);
+                const ansPinyin = normalizeAnswer(input.dataset.pinyin);
+                const fbEl = document.getElementById(`fb-${input.id}`);
+
+                if (userVal !== '' && (userVal === ansHanzi || userVal === ansPinyin)) {
+                    correctCount++;
+                    input.classList.remove('border-slate-300', 'border-rose-500', 'bg-rose-50');
+                    input.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-900');
+                    if (fbEl) {
+                        fbEl.classList.remove('hidden');
+                        fbEl.className = 'text-xs mt-1 font-semibold text-emerald-700';
+                        fbEl.innerText = `✓ Chính xác! (${input.dataset.hanzi} - ${input.dataset.pinyin})`;
+                    }
+                } else {
+                    input.classList.remove('border-slate-300', 'border-emerald-500', 'bg-emerald-50');
+                    input.classList.add('border-rose-500', 'bg-rose-50', 'text-rose-900');
+                    if (fbEl) {
+                        fbEl.classList.remove('hidden');
+                        fbEl.className = 'text-xs mt-1 font-semibold text-rose-600';
+                        fbEl.innerText = `✗ Chưa đúng. Đáp án: ${input.dataset.hanzi} (${input.dataset.pinyin})`;
+                    }
+                }
+            });
+
+            const scoreEl = document.getElementById(`d${dialogueNum}-score`);
+            if (scoreEl) {
+                if (correctCount === inputs.length) {
+                    scoreEl.innerHTML = `<span class="text-emerald-600 font-bold">🎉 Xuất sắc! Bạn đã điền đúng toàn bộ ${correctCount}/${inputs.length} chỗ trống!</span>`;
+                } else {
+                    scoreEl.innerHTML = `<span class="text-rose-600 font-bold">Kết quả: Đúng ${correctCount}/${inputs.length} chỗ trống. Hãy xem sửa lỗi màu đỏ ở trên nhé!</span>`;
+                }
+            }
+        }
+
+        function resetDialogueInputs(dialogueNum) {
+            if (dialogueNum === 1) updateDialogue1();
+            else updateDialogue2();
+        }
+
+        function playDialogue(num) {
+            stopSpeech();
+            isPlayingSequence = true;
+            const lines = num === 1 ? currentD1Lines : currentD2Lines;
+            let idx = 0;
+            function nextLine() {
+                if (!isPlayingSequence) return;
+                if (idx < lines.length) {
+                    const line = lines[idx];
+                    idx++;
+                    speakChinese(line.hanzi, line.role, () => {
+                        if (isPlayingSequence) setTimeout(nextLine, 400);
+                    });
+                } else {
+                    isPlayingSequence = false;
+                    hideToast();
+                }
+            }
+            nextLine();
+        }
+
+        // Initialize App
+        window.onload = function() {
+            renderVocabulary();
+            updateDialogue1();
+            updateDialogue2();
+        };
+    </script>
+</body>
+</html>
